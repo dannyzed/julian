@@ -16,10 +16,12 @@ print(dt)
 ```
 2007-09-29 18:43:11.999982
 ```
+
 ```python
 jd = julian.to_jd(dt + datetime.timedelta(hours=12), fmt='jd')
 print(jd)
 ```
+
 ```
 2454373.78
 ```
