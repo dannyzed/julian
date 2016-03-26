@@ -32,3 +32,7 @@ print(jd)
 Installation
 ------------
 julian is tested on python versions >= 3.2
+
+```
+pip install julian
+```
