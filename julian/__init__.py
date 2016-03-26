@@ -1,1 +1,1 @@
-from julian.julian import to_mjd, from_mjd
+from julian.julian import to_jd, from_jd
