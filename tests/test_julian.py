@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 import julian
 
 
@@ -58,6 +58,31 @@ class JulianTests(unittest.TestCase):
             self.assertAlmostEqual(jd, new_jd)
 
             jd += jd_delta
+
+    def test_to_jd_with_numpy(self):
+        """
+        Tests functionality with numpy arrays
+        """
+        import numpy as np
+
+        mjds = np.linspace(54372, 54380, 100)
+
+        dts = julian.from_jd(mjds, fmt='mjd')
+
+        for mjd, dt in zip(mjds, dts):
+            self.assertAlmostEqual(dt, julian.from_jd(mjd, fmt='mjd'))
+
+    def test_from_jd_with_numpy(self):
+        """
+        Tests functionality of converting to jd with numpy arrays
+        """
+        start_dt = datetime(year=2015, day=1, month=1, second=40)
+
+        dts = [start_dt + timedelta(hours=idx) for idx in range(0, 100)]
+        mjds = julian.to_jd(dts, fmt='mjd')
+
+        for mjd, dt in zip(mjds, dts):
+            self.assertAlmostEqual(mjd, julian.to_jd(dt, fmt='mjd'))
 
 if __name__ == "__main__":
     unittest.main()

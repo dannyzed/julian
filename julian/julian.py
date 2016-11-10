@@ -1,5 +1,5 @@
 from datetime import datetime
-import math
+import numpy as np
 
 
 def __to_format(jd: float, fmt: str) -> float:
@@ -45,7 +45,7 @@ def __from_format(jd: float, fmt: str) -> (int, float):
     if fmt.lower() == 'jd':
         # If jd has a fractional component of 0, then we are 12 hours into
         # the day
-        return math.floor(jd + 0.5), jd + 0.5 - math.floor(jd + 0.5)
+        return np.floor(jd + 0.5), jd + 0.5 - np.floor(jd + 0.5)
     elif fmt.lower() == 'mjd':
         return __from_format(jd + 2400000.5, 'jd')
     elif fmt.lower() == 'rjd':
@@ -70,11 +70,11 @@ def to_jd(dt: datetime, fmt: str = 'jd') -> float:
     -------
     jd: float
     """
-    a = math.floor((14-dt.month)/12)
+    a = np.floor((14-dt.month)/12)
     y = dt.year + 4800 - a
     m = dt.month + 12*a - 3
 
-    jdn = dt.day + math.floor((153*m + 2)/5) + 365*y + math.floor(y/4) - math.floor(y/100) + math.floor(y/400) - 32045
+    jdn = dt.day + np.floor((153*m + 2)/5) + 365*y + np.floor(y/4) - np.floor(y/100) + np.floor(y/400) - 32045
 
     jd = jdn + (dt.hour - 12) / 24 + dt.minute / 1440 + dt.second / 86400 + dt.microsecond / 86400000000
 
@@ -111,24 +111,30 @@ def from_jd(jd: float, fmt: str = 'jd') -> datetime:
     j = j+2-12*l
     i = 100*(n-49)+i+l
 
-    year = int(i)
-    month = int(j)
-    day = int(k)
+    year = np.floor(i)
+    month = np.floor(j)
+    day = np.floor(k)
 
     # in microseconds
-    frac_component = int(jdf * (1e6*24*3600))
+    frac_component = np.floor(jdf * (1e6*24*3600))
 
-    hours = int(frac_component // (1e6*3600))
+    hours = np.floor(frac_component // (1e6*3600))
     frac_component -= hours * 1e6*3600
 
-    minutes = int(frac_component // (1e6*60))
+    minutes = np.floor(frac_component // (1e6*60))
     frac_component -= minutes * 1e6*60
 
-    seconds = int(frac_component // 1e6)
+    seconds = np.floor(frac_component // 1e6)
     frac_component -= seconds*1e6
 
-    frac_component = int(frac_component)
+    frac_component = np.floor(frac_component)
 
-    dt = datetime(year=year, month=month, day=day,
-                  hour=hours, minute=minutes, second=seconds, microsecond=frac_component)
-    return dt
+    if type(year) == np.ndarray:
+        dt = [datetime(year=int(y), month=int(m), day=int(d), hour=int(h), minute=int(mi), second=int(s), microsecond=int(f))
+        for y, m, d, h, mi, s, f in zip(year, month, day, hours, minutes, seconds, frac_component)]
+
+        return dt
+    else:
+        dt = datetime(year=int(year), month=int(month), day=int(day),
+                      hour=int(hours), minute=int(minutes), second=int(seconds), microsecond=int(frac_component))
+        return dt
