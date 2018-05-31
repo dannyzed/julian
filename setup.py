@@ -4,7 +4,7 @@ from distutils.core import setup
 try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
-except(IOError, ImportError):
+except:
     long_description = ''
 
 
